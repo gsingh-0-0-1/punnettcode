@@ -68,13 +68,18 @@ def pseudo_outer_prod(l):
 
 
 	return out_array
-#Change these as you like
-p1 = 'SsYy'
-p2 = 'SsYy'
+
+p1 = input("Parent 1 Genotype: ")
+p2 = input("Parent 2 Genotype: ")
+
+if p1 == '' or p2 == '':
+	#Change these defaults as you like
+	p1 = 'SsYyZz'
+	p2 = 'SsYyZz'
 
 #split into lists
-l1 = [p1[ind] + p1[ind + 1] for ind in range(0, len(p1), 2)]
-l2 = [p2[ind] + p2[ind + 1] for ind in range(0, len(p2), 2)]
+l1 = [p1[ind : ind + 2] for ind in range(0, len(p1), 2)]
+l2 = [p2[ind : ind + 2] for ind in range(0, len(p2), 2)]
 
 #make sure that the number of genes in each of the lists is the same
 assert len(l1) == len(l2)
@@ -82,6 +87,14 @@ assert len(l1) == len(l2)
 #some other checks
 assert len(l1) >= 1
 n = len(l1)
+
+genes = []
+#create a list of the genes that we're dealing with so we can print useful
+#output at the end
+for i in range(n):
+	genes.append(l1[i][0].upper())
+
+genes = sorted(genes)
 
 #obtain the possible genotype pairings for the Punnett Square we want to set up
 #we can skip this for the case of n = 1 - since we'll just cross the contents of
@@ -109,13 +122,83 @@ shape = output.shape
 output = output.flatten()
 for ind in range(len(output)):
 	output[ind] = "".join(sorted(output[ind], key = str.casefold))
-	templ = [output[ind][i] + output[ind][i + 1] for i in range(0, len(output[ind]), 2)]
+	templ = [output[ind][i : i + 2] for i in range(0, len(output[ind]), 2)]
 	templ = ["".join(sorted(el)) for el in templ]
 	sorted_output = "".join(templ)
 	output[ind] = sorted_output
 
 output = np.reshape(output, shape)
 
-print(output)
+dashes = int((n * 2) / 8) + 1
+dashes *= 8 * (n ** 2)
+
+for rep in range(dashes): print("-", end='')
+print()
+for i in output:
+	for j in i:
+		print(j, end='\t')
+	print()
+for rep in range(dashes): print("-", end='')
+print()
+
+flat = output.flatten()
+
+
+
+unique, counts = np.unique(output, return_counts=True)
+
+sorted_indices = np.argsort(counts)[::-1]
+unique = unique[sorted_indices]
+counts = counts[sorted_indices]
+
+counts = np.concatenate((unique[:, np.newaxis], counts[:, np.newaxis]), axis = 1)
+
+#Genotype breakdown
+print()
+print("Overall Genotype Breakdown:-----------------")
+for element in counts:
+	print(element[0], '\t', element[1])
+
+
+
+
+
+#Phenotype breakdown
+phenotype = np.full(output.shape, '', dtype=object).flatten()
+for ind in range(flat.shape[0]):
+	el = flat[ind]
+	spl = [el[i : i + 2] for i in range(0, len(el), 2)]
+	for i in range(n):
+		if genes[i].upper() in spl[i]:
+			phenotype[ind] += '1'
+		else:
+			phenotype[ind] += '0'
+
+phenotype = phenotype.reshape(output.shape)
+
+unique, counts = np.unique(phenotype, return_counts=True)
+
+sorted_indices = np.argsort(counts)[::-1]
+unique = unique[sorted_indices]
+counts = counts[sorted_indices]
+
+counts = np.concatenate((unique[:, np.newaxis], counts[:, np.newaxis]), axis = 1)
+
+print()
+print("Overall Phenotype Breakdown:----------------")
+for element in counts:
+	phen = element[0]
+	for ind in range(len(phen)):
+		if phen[ind] == '1':
+			print("DOM in " + genes[ind], end='')
+		else:
+			print("REC in " + genes[ind], end='')
+
+		if ind != len(phen) - 1:
+			print('', end=', ')
+		else:
+			print('', end=': ')
+
+	print(element[1])
 
 
