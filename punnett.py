@@ -129,17 +129,18 @@ for ind in range(len(output)):
 
 output = np.reshape(output, shape)
 
-dashes = int((n * 2) / 8) + 1
-dashes *= 8 * (n ** 2)
+dashes = (2 ** n) * 8
+dashes = round(dashes / 8) * 8 + 1
 
 for rep in range(dashes): print("-", end='')
 print()
 for i in output:
+	print("|", end='')
 	for j in i:
-		print(j, end='\t')
+		print(j, end='\t|')
 	print()
-for rep in range(dashes): print("-", end='')
-print()
+	for rep in range(dashes): print("-", end='')
+	print()
 
 flat = output.flatten()
 
