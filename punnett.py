@@ -154,11 +154,13 @@ counts = counts[sorted_indices]
 
 counts = np.concatenate((unique[:, np.newaxis], counts[:, np.newaxis]), axis = 1)
 
+total = counts.sum(axis = 0)[1]
+
 #Genotype breakdown
 print()
 print("Overall Genotype Breakdown:-----------------")
 for element in counts:
-	print(element[0], '\t', element[1])
+	print(element[0], '\t', element[1], '\t', element[1], "/", total)
 
 
 
@@ -185,6 +187,8 @@ counts = counts[sorted_indices]
 
 counts = np.concatenate((unique[:, np.newaxis], counts[:, np.newaxis]), axis = 1)
 
+total = counts.sum(axis = 0)[1]
+
 print()
 print("Overall Phenotype Breakdown:----------------")
 for element in counts:
@@ -200,6 +204,6 @@ for element in counts:
 		else:
 			print('', end=': ')
 
-	print(element[1])
+	print(element[1], '\t', element[1], "/", total)
 
 
